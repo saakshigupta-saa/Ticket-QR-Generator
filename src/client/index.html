@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>The QR Code Generator</title>
+
+  <link
+    rel="stylesheet"
+    href="./style.css"
+  />
+</head>
+
+<body>
+
+  <!-- ================================
+       NAVBAR
+  ================================= -->
+
+  <header class="navbar">
+
+    <a
+      href="/"
+      class="brand"
+      aria-label="The QR Code Generator home"
+    >
+
+      <div
+        class="brand-icon"
+        aria-hidden="true"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <div class="brand-name">
+        <span>THE QR CODE</span>
+        <span>GENERATOR</span>
+      </div>
+
+    </a>
+
+
+    <div class="nav-status">
+      <span class="status-dot"></span>
+      System Online
+    </div>
+
+  </header>
+
+
+  <!-- ================================
+       MAIN
+  ================================= -->
+
+  <main>
+
+    <!-- ================================
+         HERO
+    ================================= -->
+
+    <section class="hero">
+
+      <div class="hero-content">
+
+        <p class="hero-label">
+          TICKET MANAGEMENT PLATFORM
+        </p>
+
+        <h1>
+          Ticket QR Code Generator
+          <br />
+          for Fast and Secure Check-in
+        </h1>
+
+        <p class="hero-description">
+          Speed up check-in, prevent duplicate tickets,
+          and track real-time ticket activity at every
+          entry gate.
+        </p>
+
+        <div class="hero-actions">
+
+          <a
+            href="#ticket-generator"
+            class="hero-button"
+          >
+            Generate a Ticket QR
+
+            <span aria-hidden="true">
+              →
+            </span>
+          </a>
+
+          <span class="hero-note">
+            Built for fast floor operations
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================================
+         TICKET GENERATOR
+    ================================= -->
+
+    <section
+      id="ticket-generator"
+      class="generator-section"
+    >
+
+      <div class="section-intro">
+
+        <p class="section-label">
+          CREATE TICKET
+        </p>
+
+        <h2>
+          Generate your ticket
+        </h2>
+
+        <p>
+          Enter the ticket information below to create
+          a secure QR-enabled ticket.
+        </p>
+
+      </div>
+
+
+      <div class="generator-layout">
+
+
+        <!-- ================================
+             CREATE TICKET FORM
+        ================================= -->
+
+        <section class="generator-card">
+
+          <div class="card-header">
+
+            <div>
+
+              <p class="card-label">
+                TICKET DETAILS
+              </p>
+
+              <h3>
+                Create a new ticket
+              </h3>
+
+            </div>
+
+            <span class="card-number">
+              01
+            </span>
+
+          </div>
+
+
+          <form
+            id="ticketForm"
+            novalidate
+          >
+
+            <div class="form-grid">
+
+
+              <!-- TITLE -->
+
+              <div class="form-field">
+
+                <label for="title">
+                  Ticket Title
+                </label>
+
+                <input
+                  id="title"
+                  name="title"
+                  type="text"
+                  maxlength="100"
+                  placeholder="e.g. Printer issue on Floor 2"
+                  autocomplete="off"
+                  aria-required="true"
+                />
+
+                <span
+                  id="titleError"
+                  class="field-error"
+                  role="alert"
+                ></span>
+
+              </div>
+
+
+              <!-- PRIORITY -->
+
+              <div class="form-field">
+
+                <label for="priority">
+                  Priority
+                </label>
+
+                <select
+                  id="priority"
+                  name="priority"
+                  aria-required="true"
+                >
+
+                  <option value="">
+                    Select priority
+                  </option>
+
+                  <option value="LOW">
+                    Low
+                  </option>
+
+                  <option value="MEDIUM">
+                    Medium
+                  </option>
+
+                  <option value="HIGH">
+                    High
+                  </option>
+
+                  <option value="CRITICAL">
+                    Critical
+                  </option>
+
+                </select>
+
+                <span
+                  id="priorityError"
+                  class="field-error"
+                  role="alert"
+                ></span>
+
+              </div>
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="form-field">
+
+              <label for="description">
+                Description
+              </label>
+
+              <textarea
+                id="description"
+                name="description"
+                maxlength="1000"
+                rows="5"
+                placeholder="Describe the ticket or issue..."
+              ></textarea>
+
+              <span
+                id="descriptionError"
+                class="field-error"
+                role="alert"
+              ></span>
+
+            </div>
+
+
+            <!-- CREATE BUTTON -->
+
+            <button
+              id="createTicketBtn"
+              class="create-button"
+              type="submit"
+              aria-label="Create ticket"
+            >
+
+              <span id="createButtonText">
+                Create Ticket
+              </span>
+
+              <span
+                id="createLoader"
+                class="loader hidden"
+                aria-hidden="true"
+              ></span>
+
+            </button>
+
+          </form>
+
+        </section>
+
+
+        <!-- ================================
+             RECENT TICKETS
+        ================================= -->
+
+        <section
+          class="tickets-panel"
+          aria-labelledby="tickets-heading"
+        >
+
+          <div class="panel-header">
+
+            <div>
+
+              <p class="card-label">
+                WORK QUEUE
+              </p>
+
+              <h3 id="tickets-heading">
+                Recent Tickets
+              </h3>
+
+            </div>
+
+
+            <button
+              id="refreshBtn"
+              class="refresh-button"
+              type="button"
+              aria-label="Refresh tickets"
+            >
+              Refresh
+            </button>
+
+          </div>
+
+
+          <!-- LOADING -->
+
+          <div
+            id="ticketsLoader"
+            class="loading-state hidden"
+            role="status"
+            aria-live="polite"
+          >
+            Loading tickets...
+          </div>
+
+
+          <!-- EMPTY -->
+
+          <div
+            id="emptyState"
+            class="empty-state hidden"
+            role="status"
+          >
+
+            <h4>
+              No data found
+            </h4>
+
+            <p>
+              Create your first ticket to get started.
+            </p>
+
+          </div>
+
+
+          <!-- TICKETS -->
+
+          <div
+            id="ticketsList"
+            class="tickets-list"
+            aria-live="polite"
+          ></div>
+
+
+          <!-- ================================
+               QR RESULT
+          ================================= -->
+
+          <div
+            id="qrResult"
+            class="qr-result hidden"
+            aria-live="polite"
+          >
+
+            <div class="qr-result-header">
+
+              <div>
+
+                <p class="card-label">
+                  QR CODE
+                </p>
+
+                <h3>
+                  Ticket QR Generated
+                </h3>
+
+              </div>
+
+
+              <button
+                id="closeQrBtn"
+                class="refresh-button"
+                type="button"
+                aria-label="Close generated QR code"
+              >
+                Close
+              </button>
+
+            </div>
+
+
+            <div class="qr-display">
+
+              <!-- QR CODE WILL APPEAR HERE -->
+
+              <div
+                id="qrCodeImage"
+                class="qr-code-image"
+                aria-label="Generated ticket QR code"
+              ></div>
+
+
+              <div class="qr-details">
+
+                <p class="qr-detail-label">
+                  QR Identifier
+                </p>
+
+                <p
+                  id="qrIdentifier"
+                  class="qr-identifier"
+                >
+                  -
+                </p>
+
+
+                <div class="qr-status">
+
+                  <span class="status-dot"></span>
+
+                  <span>
+                    Active
+                  </span>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- ================================
+       FOOTER
+  ================================= -->
+
+  <footer class="footer">
+
+    <div class="footer-brand">
+      THE QR CODE GENERATOR
+    </div>
+
+    <p>
+      Secure ticket management for modern operations.
+    </p>
+
+  </footer>
+
+
+  <script src="./script.js"></script>
+
+</body>
+</html>
+

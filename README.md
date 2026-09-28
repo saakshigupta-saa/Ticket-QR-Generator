@@ -1,364 +1,562 @@
-# AI-Assisted Engineering Prompt Log
+# 🎟️ Ticket QR Code Generator Worker
 
-## Project
+A full-stack **Ticket QR Code Generator Worker** designed to digitize ticket creation and QR-code management for floor staff.
 
-**Ticket QR Code Generator Worker**
-
-**Ticket ID:** ENG-139055
-
-**Epic:** Core Infrastructure Overhaul
-
-**Priority:** P1
-
-**Assigned To:** Sakshi Gupta
+The system replaces manual paper/Excel-based ticket workflows with a structured digital workflow for **creating tickets, generating QR codes, reusing QR codes, revoking QR codes, and managing ticket status**.
 
 ---
 
-# 1. Project Understanding
+## 🚀 Project Overview
 
-### Prompt
+The Ticket QR Code Generator Worker provides a simple interface for floor staff to create and manage tickets and generate QR codes for fast check-in operations.
 
-> I am working on Ticket ENG-139055, "Ticket QR Code Generator Worker". Review the provided Technical Requirements Document and help me understand the requirements before writing any implementation code.
->
-> The current phase is architectural planning only. Do not generate feature code yet.
->
-> Identify the required entities, relationships, API resources, validation requirements, edge cases, accessibility requirements, security requirements, telemetry requirements, and non-functional requirements.
+### Core capabilities
 
-### Purpose
-
-Used to understand the assignment and separate architectural planning from feature implementation.
-
----
-
-# 2. Database Entity Identification
-
-### Prompt
-
-> Based on the Ticket QR Code Generator Worker requirements, identify the minimum set of database entities required for the system.
->
-> For each entity, explain its responsibility and the relationships between entities.
->
-> Focus only on database architecture. Do not write application code.
-
-### Purpose
-
-Used to establish the initial domain model.
+* 🎫 Create tickets
+* 📋 View recent tickets
+* 🔳 Generate QR codes
+* ♻️ Reuse existing QR codes
+* 🚫 Revoke QR codes
+* 🔄 Reactivate revoked QR codes
+* 🛡️ Input validation and sanitization
+* 📡 Loading states for asynchronous operations
+* ♿ Accessibility-focused interface
+* 📊 Simulated telemetry
+* 🗄️ MongoDB persistence
+* 🧪 Automated API testing
 
 ---
 
-# 3. Database Schema Design
+## ✨ Features
 
-### Prompt
+### Ticket Management
 
-> Design a definitive database schema for the Ticket QR Code Generator Worker.
->
-> Include:
->
-> * Entity names
-> * Field names
-> * Data types
-> * Primary keys
-> * Foreign keys
-> * Unique constraints
-> * Enum values
-> * Indexes
-> * Timestamps
-> * Data integrity rules
->
-> The schema should support ticket creation, QR generation, QR status management, and QR generation audit history.
->
-> Keep the design normalized and suitable for an enterprise application.
+Create tickets with:
 
-### Purpose
+* Ticket title
+* Description
+* Priority
+* Ticket status
+* Creator information
+* Automatically generated ticket number
 
-Used to create `DATABASE_SCHEMA.md`.
+Supported priorities:
 
----
+```text
+LOW
+MEDIUM
+HIGH
+CRITICAL
+```
 
-# 4. ERD Design
+Supported statuses:
 
-### Prompt
-
-> Create an Entity Relationship Diagram for the proposed Ticket QR Code Generator Worker database.
->
-> The diagram should clearly show:
->
-> * User
-> * Ticket
-> * QRCode
-> * QRGenerationLog
-> * Primary keys
-> * Foreign keys
-> * One-to-many relationships
-> * One-to-zero-or-one Ticket-to-QRCode relationship
->
-> Provide the ERD in Mermaid format so it can be stored in Markdown and rendered by GitHub.
-
-### Purpose
-
-Used to create `ERD.md`.
+```text
+OPEN
+IN_PROGRESS
+RESOLVED
+CLOSED
+```
 
 ---
 
-# 5. API Contract Design
+### QR Code Management
 
-### Prompt
+Each ticket can have one current QR code.
 
-> Design REST API contracts for the Ticket QR Code Generator Worker without implementing the APIs.
->
-> Include contracts for:
->
-> * Creating tickets
-> * Listing tickets
-> * Retrieving a ticket
-> * Generating a QR code
-> * Retrieving a QR code
-> * Revoking a QR code
-> * Retrieving QR generation history
->
-> For each endpoint specify:
->
-> * HTTP method
-> * URL
-> * Purpose
-> * Request parameters/body
-> * Validation rules
-> * Success response
-> * Error responses
-> * HTTP status codes
->
-> Use consistent JSON response structures.
+QR lifecycle:
 
-### Purpose
+```text
+No QR
+  ↓
+Generate
+  ↓
+ACTIVE
+  ↓
+Revoke
+  ↓
+REVOKED
+  ↓
+Generate Again
+  ↓
+ACTIVE
+```
 
-Used to create `API_CONTRACTS.md`.
+When a QR already exists, the system avoids creating another QR record for the same ticket.
 
 ---
 
-# 6. Edge-Case Architecture
+## 🖥️ User Interface
 
-### Prompt
+The frontend provides:
 
-> Design the edge-case and failure-state architecture for the Ticket QR Code Generator Worker.
->
-> The implementation must handle:
->
-> * Empty states
-> * Slow 3G connectivity
-> * Network failures
-> * Loading states
-> * Invalid inputs
-> * Duplicate QR generation requests
-> * QR generation failures
-> * XSS attempts
-> * Unexpected frontend errors
->
-> Explain the expected behavior of the UI, API, database, and audit logging in each situation.
->
-> Do not write feature implementation code.
+* Modern corporate landing-page design
+* Ticket creation form
+* Recent ticket list
+* QR generation interface
+* QR result display
+* Loading indicators
+* Empty states
+* Validation feedback
+* Responsive layout
+* Keyboard-accessible controls
 
-### Purpose
-
-Used to document the "Unhappy Path" requirements.
+The UI follows a clean monochromatic corporate design with controlled accent colors and consistent spacing.
 
 ---
 
-# 7. Accessibility Architecture
+## 🏗️ Architecture
 
-### Prompt
+The application follows a layered backend structure:
 
-> Define an accessibility architecture for the Ticket QR Code Generator Worker targeting a 100% Lighthouse accessibility score.
->
-> Cover:
->
-> * Keyboard navigation
-> * Accessible button and input labels
-> * ARIA attributes
-> * Validation error associations
-> * Loading states
-> * Focus states
-> * Color contrast
-> * Screen-reader-friendly status messages
->
-> Provide implementation-oriented guidance without writing the final application code.
-
-### Purpose
-
-Used to document the accessibility requirements.
-
----
-
-# 8. Security Architecture
-
-### Prompt
-
-> Define the security requirements for the Ticket QR Code Generator Worker.
->
-> The requirements include sanitizing user-controlled text against XSS before storing it in application state, server-side validation, protection of credentials, safe logging, and avoiding sensitive information in telemetry.
->
-> Explain where validation and sanitization should occur and how the architecture should prevent unsafe data from reaching the database or UI.
-
-### Purpose
-
-Used to document the security architecture.
+```text
+┌──────────────────────────────┐
+│        Client UI             │
+│   HTML + CSS + JavaScript    │
+└──────────────┬───────────────┘
+               │
+               ▼
+┌──────────────────────────────┐
+│        Express API           │
+│ Routes + Validation          │
+└──────────────┬───────────────┘
+               │
+               ▼
+┌──────────────────────────────┐
+│       MongoDB / Mongoose     │
+│ Ticket + QRCode Collections  │
+└──────────────────────────────┘
+```
 
 ---
 
-# 9. Telemetry Design
+## 📁 Project Structure
 
-### Prompt
-
-> Design a simulated telemetry approach for the Ticket QR Code Generator Worker.
->
-> The primary action should log:
->
-> [Analytics] User interacted with Ticket QR Code Generator Worker
->
-> Explain when this event should fire, what information should not be logged, and how telemetry should remain separate from the main business operation.
-
-### Purpose
-
-Used to define the telemetry behavior required by the TRD.
-
----
-
-# 10. Corporate UI Design System
-
-### Prompt
-
-> Define a clean monochromatic corporate design system for the Ticket QR Code Generator Worker.
->
-> Follow these constraints:
->
-> * No rogue hex colors
-> * Consistent spacing using 16px and 32px steps
-> * Consistent typography
-> * Consistent buttons and inputs
-> * Accessible contrast
-> * Clear visual hierarchy
-> * Professional enterprise appearance
->
-> Do not introduce unnecessary visual styles.
-
-### Purpose
-
-Used to establish the design handoff requirements.
-
----
-
-# 11. Architecture Review
-
-### Prompt
-
-> Review the complete proposed architecture for the Ticket QR Code Generator Worker.
->
-> Check whether the database schema, ERD, API contracts, edge-case handling, accessibility, security, telemetry, and design-system requirements are consistent with each other.
->
-> Identify missing requirements, contradictions, unnecessary complexity, or potential reliability problems.
->
-> Do not write implementation code. Provide architectural corrections only.
-
-### Purpose
-
-Used as a final architecture review before implementation.
+```text
+Ticket-QR-Generator/
+│
+├── docs/
+│   ├── ARCHITECTURE.md
+│   ├── API_CONTRACTS.md
+│   ├── DATABASE_SCHEMA.md
+│   └── ERD.md
+│
+├── src/
+│   ├── client/
+│   │   ├── index.html
+│   │   ├── style.css
+│   │   └── script.js
+│   │
+│   ├── config/
+│   │   └── database.js
+│   │
+│   ├── models/
+│   │   ├── Ticket.js
+│   │   └── QRCode.js
+│   │
+│   ├── routes/
+│   │   └── ticketRoutes.js
+│   │
+│   └── server.js
+│
+├── tests/
+│   └── tickets.test.js
+│
+├── PROMPTS.md
+├── README.md
+├── package.json
+├── package-lock.json
+└── .gitignore
+```
 
 ---
 
-# 12. Engineering Approach
+## 🔌 API Endpoints
 
-The project follows an AI-assisted engineering workflow.
+### Health Check
 
-The intended implementation process is:
+```http
+GET /api/health
+```
+
+Returns:
+
+```json
+{
+  "status": "ok"
+}
+```
+
+---
+
+### Create Ticket
+
+```http
+POST /api/tickets
+```
+
+Example:
+
+```json
+{
+  "title": "Printer Issue",
+  "description": "Printer not working on Floor 2",
+  "priority": "HIGH",
+  "createdBy": "00000000-0000-4000-8000-000000000001"
+}
+```
+
+---
+
+### Get All Tickets
+
+```http
+GET /api/tickets
+```
+
+---
+
+### Get Ticket
+
+```http
+GET /api/tickets/:id
+```
+
+---
+
+### Update Ticket Status
+
+```http
+PUT /api/tickets/:id
+```
+
+Example:
+
+```json
+{
+  "status": "RESOLVED"
+}
+```
+
+---
+
+### Generate QR
+
+```http
+POST /api/tickets/:id/qr
+```
+
+Behavior:
+
+```text
+Active QR
+    ↓
+Return existing QR
+
+Revoked QR
+    ↓
+Reactivate existing QR
+
+No QR
+    ↓
+Create QR
+```
+
+---
+
+### Get QR
+
+```http
+GET /api/tickets/:id/qr
+```
+
+---
+
+### Revoke QR
+
+```http
+POST /api/tickets/:id/qr/revoke
+```
+
+---
+
+## 🗄️ Database
+
+MongoDB is used as the persistence layer.
+
+### Ticket
+
+Stores:
+
+* ticket number
+* title
+* description
+* priority
+* status
+* creator
+* timestamps
+
+### QRCode
+
+Stores:
+
+* ticket reference
+* QR identifier
+* QR payload
+* QR status
+* generation timestamp
+* update timestamp
+
+---
+
+## 🔐 Security
+
+The application includes:
+
+* Server-side input validation
+* Client-side validation
+* Text sanitization
+* XSS protection
+* Environment variables for database configuration
+* No hardcoded database credentials
+* Safe API error responses
+* No sensitive information in telemetry
+
+User-controlled text is sanitized before being stored or rendered.
+
+---
+
+## ♿ Accessibility
+
+The UI is designed with accessibility in mind:
+
+* Semantic HTML
+* Associated labels
+* Keyboard navigation
+* Focus states
+* ARIA labels
+* `aria-live` status messages
+* Accessible validation errors
+* Non-color-only error communication
+* Reduced-motion support
+
+---
+
+## 📡 Telemetry
+
+Primary actions simulate an analytics event through the browser/server console:
+
+```text
+[Analytics] User interacted with Ticket QR Code Generator Worker
+```
+
+Telemetry is simulation-only and does not intentionally contain sensitive information.
+
+---
+
+## 🧪 Testing
+
+The project uses:
+
+* Jest
+* Supertest
+* MongoDB
+* Mongoose
+
+Run the test suite:
+
+```bash
+npm test
+```
+
+Current automated test result:
+
+```text
+Test Suites: 2 passed, 2 total
+Tests:       26 passed, 26 total
+Snapshots:   0 total
+```
+
+---
+
+## ⚙️ Installation
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/saakshigupta-saa/Ticket-QR-Generator.git
+```
+
+```bash
+cd Ticket-QR-Generator
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Configure environment variables
+
+Create:
+
+```text
+.env
+```
+
+Add your MongoDB connection string:
+
+```env
+MONGO_URI=your_mongodb_connection_string
+```
+
+Do not commit `.env` to GitHub.
+
+---
+
+## ▶️ Run the Application
+
+Development mode:
+
+```bash
+npm run dev
+```
+
+The application runs on:
+
+```text
+http://localhost:5000
+```
+
+---
+
+## 📜 Available Scripts
+
+| Command       | Purpose                               |
+| ------------- | ------------------------------------- |
+| `npm run dev` | Start development server with Nodemon |
+| `npm start`   | Start production server               |
+| `npm test`    | Run automated tests                   |
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+
+* HTML5
+* CSS3
+* JavaScript
+
+### Backend
+
+* Node.js
+* Express.js
+
+### Database
+
+* MongoDB
+* Mongoose
+
+### Testing
+
+* Jest
+* Supertest
+
+### Development
+
+* Nodemon
+* Git
+* GitHub
+
+---
+
+## 📚 Documentation
+
+Detailed project documentation is available in the `docs/` directory.
+
+| Document             | Purpose                                    |
+| -------------------- | ------------------------------------------ |
+| `ARCHITECTURE.md`    | System architecture and edge-case strategy |
+| `API_CONTRACTS.md`   | API request/response contracts             |
+| `DATABASE_SCHEMA.md` | Database design                            |
+| `ERD.md`             | Entity Relationship Diagram                |
+| `PROMPTS.md`         | AI-assisted engineering prompt history     |
+
+---
+
+## 🔄 Development Workflow
+
+The project follows a test-driven and AI-assisted development workflow:
 
 ```text
 Requirements
      ↓
 Architecture
      ↓
-Test Design
+Database Design
+     ↓
+API Contracts
+     ↓
+Test Suite
      ↓
 Failing Tests
      ↓
 Implementation
      ↓
-Test Execution
+Testing
      ↓
 Browser Verification
-     ↓
-Linting
      ↓
 Final Review
 ```
 
-The AI is used as an engineering assistant rather than as a replacement for verification.
-
-All generated work should be reviewed against the Technical Requirements Document before acceptance.
+The AI assistant is used to accelerate development while implementation decisions and verification remain the responsibility of the engineer.
 
 ---
 
-# 13. TDD Requirement
+## 📌 Project Status
 
-Before feature implementation, the acceptance criteria and NFRs should be converted into automated tests using Jest or Vitest.
+**Status: Functional MVP**
 
-The expected workflow is:
+Implemented:
 
-```text
-Acceptance Criteria
-       ↓
-Write Tests
-       ↓
-Run Tests
-       ↓
-Tests Fail
-       ↓
-Implement Feature
-       ↓
-Run Tests Again
-       ↓
-Fix Failures
-       ↓
-Manual Browser Verification
-```
-
-Feature implementation should not be considered complete merely because the application renders successfully.
+* [x] MongoDB connection
+* [x] Ticket creation
+* [x] Ticket listing
+* [x] Ticket retrieval
+* [x] Ticket status update
+* [x] QR generation
+* [x] QR reuse
+* [x] QR revocation
+* [x] QR reactivation
+* [x] Frontend interface
+* [x] QR display
+* [x] Input validation
+* [x] XSS sanitization
+* [x] Loading states
+* [x] Empty states
+* [x] Accessibility-focused UI
+* [x] Telemetry simulation
+* [x] Automated API tests
 
 ---
 
-# 14. Verification Checklist
+## 👩‍💻 Author
 
-Before final delivery, verify:
+**Sakshi Gupta**
 
-* [ ] Application starts without fatal errors
-* [ ] Tests pass
-* [ ] Linting passes
-* [ ] No unused imports
-* [ ] Empty states work
-* [ ] Loading indicators work
-* [ ] Network failures are handled
-* [ ] Invalid inputs are rejected
-* [ ] Invalid fields are visually identified
-* [ ] XSS input is sanitized
-* [ ] QR generation does not create duplicate active records
-* [ ] Telemetry message is logged
-* [ ] Keyboard navigation works
-* [ ] Accessibility requirements are satisfied
-* [ ] No API keys are committed
-* [ ] No sensitive credentials are committed
-* [ ] `PROMPTS.md` is included in the repository
+BS Computer Science & Data Analytics
+IIT Patna
 
-----
+GitHub:
+https://github.com/saakshigupta-saa
 
-# 15. Documentation
-Document	Purpose
-DATABASE_SCHEMA.md	Definitive database schema
-ERD.md	Entity Relationship Diagram
-API_CONTRACTS.md	API request/response contracts
-ARCHITECTURE.md	Architecture and edge-case strategy
-PROMPTS.md	AI-assisted engineering prompt history
-README.md	Project overview
----- 
-# 16. Project Status
+---
 
-The project is currently in the architecture planning phase.
+## ⭐ Repository
 
-No feature implementation should begin until the architecture, database schema, API contracts, and test strategy have been reviewed.
+**Ticket QR Code Generator**
+
+https://github.com/saakshigupta-saa/Ticket-QR-Generator

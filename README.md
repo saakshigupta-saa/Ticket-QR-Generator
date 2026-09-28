@@ -547,12 +547,6 @@ Implemented:
 
 **Sakshi Gupta**
 
-BS Computer Science & Data Analytics
-IIT Patna
-
-GitHub:
-https://github.com/saakshigupta-saa
-
 ---
 
 ## ⭐ Repository
